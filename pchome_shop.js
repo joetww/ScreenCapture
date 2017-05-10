@@ -39,6 +39,21 @@ function waitFor(testFx, onReady, timeOutMillis) {
         }, 250); //< repeat check every 250ms
 };
 
+var system = require('system');
+var args = system.args;
+
+if (args.length !== 2) {
+    console.log('Try to pass some arguments when invoking this script!');
+    phantom.exit();
+} else {
+    args.forEach(function(arg, i) {
+        console.log(i + ': ' + arg);
+    });
+    var url = args[1];
+}
+
+
+
 var page = new WebPage();
 page.viewportSize = {
     width: 1600,
@@ -50,11 +65,11 @@ page.onLoadFinished = function() {
     console.log("page.onLoadFinished");
     page.evaluate(function() {
         document.body.bgColor = 'white';
-        $('body').css("font-family", "WenQuanYi Zen Hei Mono");
+        //$('body').css("font-family", "WenQuanYi Zen Hei Mono");
     });
 
 };
-page.open("http://24h.pchome.com.tw/prod/DMBE05-A90081FBM", function (status) {
+page.open(url, function (status) {
     // Check for page load success
     if (status !== "success") {
         console.log("Unable to access network");
