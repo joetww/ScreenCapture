@@ -42,14 +42,22 @@ function waitFor(testFx, onReady, timeOutMillis) {
 var system = require('system');
 var args = system.args;
 
-if (args.length !== 2) {
+if (args.length === 0) {
     console.log('Try to pass some arguments when invoking this script!');
     phantom.exit();
 } else {
+    var hasUrl = false;
+    var url = '';
     args.forEach(function(arg, i) {
         console.log(i + ': ' + arg);
+        if(arg.match(/^http:\/\//gi))
+        {
+            url = arg;
+            hasUrl = true;
+        }
     });
-    var url = args[1];
+    console.log('Get Url: ' + url);
+    if(!hasUrl)phantom.exit();
 }
 
 
