@@ -77,11 +77,13 @@ page.onLoadFinished = function() {
     });
 
 };
+
 page.open(url, function (status) {
     // Check for page load success
     if (status !== "success") {
         console.log("Unable to access network");
     } else {
+        console.log("Start page");
         waitFor(function() {
             // Check in the page if a specific element is now visible
             return page.evaluate(function() {
@@ -89,16 +91,30 @@ page.open(url, function (status) {
                 $("#IntroContainer > dd img").each(function(){
                     if($(this)[0].complete==true){Intro--;}
                 });
-                return (Intro==0 && $("#AlsoBody").is(":visible") && $("#AlsoBody > dd > a:nth-child(1) > img")[4].complete);
+                var AlsoImg = 0;
+                if($("#AlsoBody > dd > a:nth-child(1) > img").length > 0){
+                    var AlsoImg = $("#AlsoBody > dd > a:nth-child(1) > img").length;
+                    $("#AlsoBody > dd > a:nth-child(1) > img").each(function(){
+                        if($(this)[0].complete==true){AlsoImg--;}
+                    });
+                }
+                return (Intro < 1 && AlsoImg < 1 && $("#ImgContainer").length > 0 && $("#ButtonContainer").length > 0 && $("#IntroContainer > dd img").length > 2);
             });
         }, function() {
             console.log("The #AlsoBody should be visible now.");
-            //            page.viewportSize = {
-            //    width: 1600,
-            //    height: 32000
-            //};
             window.setTimeout(function () {
                 console.log('start capture image...');
+                console.log(page.evaluate(function(){
+                    var Intro = $("#IntroContainer > dd img").length;
+                    $("#IntroContainer > dd img").each(function(){
+                        if($(this)[0].complete==true){Intro--;}
+                    });
+                    return JSON.stringify({
+                        "IntroContainer": $("#IntroContainer > dd img").length,
+                        "IntroImageNotLoad": Intro,
+                        "AlsoBody": $("#AlsoBody > dd > a:nth-child(1) > img").length
+                    }, undefined, 4)
+                }));
                 console.log(page.evaluate(function(){
                     return JSON.stringify({
                         "document.body.scrollHeight": document.body.scrollHeight,
@@ -110,7 +126,7 @@ page.open(url, function (status) {
                 page.clipRect = { top: 0, left: 0, width: page.evaluate(function(){return document.documentElement.scrollWidth;}), height: page.evaluate(function(){return document.documentElement.scrollHeight;}) };
                 page.render('pchome_' + getFileName() + '.jpg', {format: 'jpeg', quality: '85'});
                 phantom.exit();
-            }, 100);
+            }, 250);
         });
     }
 });
