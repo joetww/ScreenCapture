@@ -16,6 +16,7 @@ function getFileName() {
 
     return date.join('-') + '_' + time.join('-') + "";
 }
+
 function waitFor(testFx, onReady, timeOutMillis) {
     var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 20000, //< Default Max Timout is 3s
         start = new Date().getTime(),
@@ -52,7 +53,7 @@ if (args.length === 0) {
         console.log(i + ': ' + arg);
         if(arg.match(/^http:\/\//gi))
         {
-            url = arg;
+            url = arg.replace(/^http:\/\/www/gi, "http://m");;
             hasUrl = true;
         }
     });
@@ -60,19 +61,16 @@ if (args.length === 0) {
     if(!hasUrl)phantom.exit();
 }
 
-
-
 var page = new WebPage();
 page.viewportSize = {
-    width: 1600,
-    height: 38000 //再大張就很麻煩了
+    width: 410,
+    height: 736 //再大張就很麻煩了
 };
-
 
 page.onLoadFinished = function() {
     console.log("page.onLoadFinished");
     page.evaluate(function() {
-        document.body.bgColor = 'white';
+        //document.body.bgColor = 'white';
         //$('body').css("font-family", "WenQuanYi Zen Hei Mono");
     });
 };
@@ -86,33 +84,18 @@ page.open(url, function (status) {
         waitFor(function() {
             // Check in the page if a specific element is now visible
             return page.evaluate(function() {
-                var Intro = $("#IntroContainer > dd img").length;
-                $("#IntroContainer > dd img").each(function(){
-                    if($(this)[0].complete==true){Intro--;}
-                });
-                var AlsoImg = 0;
-                if($("#AlsoBody > dd > a:nth-child(1) > img").length > 0){
-                    var AlsoImg = $("#AlsoBody > dd > a:nth-child(1) > img").length;
-                    $("#AlsoBody > dd > a:nth-child(1) > img").each(function(){
-                        if($(this)[0].complete==true){AlsoImg--;}
-                    });
-                }
-                return (Intro < 1 && AlsoImg < 1 && $("#ImgContainer").length > 0 && $("#ButtonContainer").length > 0 && $("#IntroContainer > dd img").length > 2);
+                return $("body > div.nm-base.nm-page-time.ui-page.ui-body-c.ui-page-panel.ui-page-active > div.ui-panel-content-wrap.ui-body-c.ui-panel-animate.ui-panel-content-wrap-closed > article > div.nm-article > div.nm-article-body > div:nth-child(1)").is(":visible");
             });
         }, function() {
             console.log("The #Intro should be visible now.");
             window.setTimeout(function () {
                 console.log('start capture image...');
                 console.log(page.evaluate(function(){
-                    var Intro = $("#IntroContainer > dd img").length;
-                    $("#IntroContainer > dd img").each(function(){
-                        if($(this)[0].complete==true){Intro--;}
-                    });
-                    return JSON.stringify({
-                        "IntroContainer": $("#IntroContainer > dd img").length,
-                        "IntroImageNotLoad": Intro,
-                        "AlsoBody": $("#AlsoBody > dd > a:nth-child(1) > img").length
-                    }, undefined, 4)
+                    $("#Cover").css("display", "none");
+                    $("#recommend_appledaily").css("display", "none");
+                    $(".nm-ad").css("display", "none");
+                    $(".nm-fb-comments").css("display", "none");
+                    $(".nm-prevnext-articles").css("display", "none");
                 }));
                 console.log(page.evaluate(function(){
                     return JSON.stringify({
@@ -123,9 +106,9 @@ page.open(url, function (status) {
                     }, undefined, 4);
                 }));
                 page.clipRect = { top: 0, left: 0, width: page.evaluate(function(){return document.documentElement.scrollWidth;}), height: page.evaluate(function(){return document.documentElement.scrollHeight;}) };
-                page.render('pchome_' + getFileName() + '.jpg', {format: 'jpeg', quality: '85'});
+                page.render('appledaily_' + getFileName() + '.jpg', {format: 'jpeg', quality: '85'});
                 phantom.exit();
-            }, 250);
+            }, 100);
         });
     }
 });
