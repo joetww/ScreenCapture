@@ -84,7 +84,7 @@ page.open(url, function (status) {
         waitFor(function() {
             // Check in the page if a specific element is now visible
             return page.evaluate(function() {
-                return $("body > div.nm-base.nm-page-time.ui-page.ui-body-c.ui-page-panel.ui-page-active > div.ui-panel-content-wrap.ui-body-c.ui-panel-animate.ui-panel-content-wrap-closed > article > div.nm-article > div.nm-article-body > div:nth-child(1)").is(":visible");
+                return $("article > div.nm-article > div.nm-article-body > div.text").is(":visible");
             });
         }, function() {
             console.log("The #Intro should be visible now.");
